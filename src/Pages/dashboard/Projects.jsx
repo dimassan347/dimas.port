@@ -14,7 +14,6 @@ import {
   X,
   ImageIcon,
   ExternalLink,
-  Github,
   Pencil,
   LayoutGrid,
   List,
@@ -97,7 +96,6 @@ const ProjectCard = ({ project, onDelete, onEdit }) => {
   const isPublished = project.is_published ?? true;
   const imgSrc = project.img || project.Img || "";
   const liveUrl = project.link || project.Link || "";
-  const githubUrl = project.github || project.Github || "";
 
   return (
     <div
@@ -153,17 +151,6 @@ const ProjectCard = ({ project, onDelete, onEdit }) => {
               title="Live Preview"
             >
               <Globe className="w-3.5 h-3.5" />
-            </a>
-          )}
-          {githubUrl && (
-            <a
-              href={githubUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-8 h-8 rounded-lg bg-black/60 border border-white/20 text-white flex items-center justify-center hover:bg-white/20 transition-colors backdrop-blur-sm"
-              title="GitHub Repo"
-            >
-              <Github className="w-3.5 h-3.5" />
             </a>
           )}
         </div>
@@ -231,17 +218,6 @@ const ProjectCard = ({ project, onDelete, onEdit }) => {
                 <ExternalLink className="w-3.5 h-3.5" />
               </a>
             )}
-            {githubUrl && (
-              <a
-                href={githubUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-1.5 rounded-lg border border-white/8 text-gray-500 hover:text-white hover:border-white/20 transition-all hover:bg-white/5"
-                title="Open GitHub"
-              >
-                <Github className="w-3.5 h-3.5" />
-              </a>
-            )}
           </div>
           <div className="flex gap-2">
             <button
@@ -272,7 +248,6 @@ const ProjectRow = ({ project, onDelete, onEdit, index }) => {
   const isPublished = project.is_published ?? true;
   const imgSrc = project.img || project.Img || "";
   const liveUrl = project.link || project.Link || "";
-  const githubUrl = project.github || project.Github || "";
 
   return (
     <div
@@ -341,13 +316,6 @@ const ProjectRow = ({ project, onDelete, onEdit, index }) => {
             className="p-1.5 rounded-lg border border-white/10 text-gray-500 hover:text-white hover:border-white/25 transition-all"
             title="Live site">
             <Globe className="w-3.5 h-3.5" />
-          </a>
-        )}
-        {githubUrl && (
-          <a href={githubUrl} target="_blank" rel="noopener noreferrer"
-            className="p-1.5 rounded-lg border border-white/10 text-gray-500 hover:text-white hover:border-white/25 transition-all"
-            title="GitHub">
-            <Github className="w-3.5 h-3.5" />
           </a>
         )}
         <button onClick={() => onEdit(project)}
@@ -423,7 +391,6 @@ const ProjectForm = ({
         ? initial.Features.join(", ")
         : initial?.features || initial?.Features || "",
     link: initial?.link || initial?.Link || "",
-    github: initial?.github || initial?.Github || "",
   });
 
   const set = (key) => (e) => setForm((f) => ({ ...f, [key]: e.target.value }));
@@ -550,19 +517,7 @@ const ProjectForm = ({
           </div>
         </div>
 
-        <div className="space-y-1.5">
-          <label className={labelCls}>GitHub URL</label>
-          <div className="relative">
-            <Github className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
-            <input
-              type="url"
-              value={form.github}
-              onChange={set("github")}
-              placeholder="https://github.com/username/repo"
-              className={`${inputCls} pl-10`}
-            />
-          </div>
-        </div>
+    
 
         {sectionTitle(<ImageIcon className="w-3 h-3" />, "Media")}
 
@@ -725,7 +680,6 @@ export default function Projects() {
       tech_stack: form.techstack.split(",").map((s) => s.trim()).filter(Boolean),
       features: form.features.split(",").map((s) => s.trim()).filter(Boolean),
       link: form.link,
-      github: form.github,
     });
     setShowCreate(false);
     pushToast("success", "Project created successfully!");
@@ -746,7 +700,6 @@ export default function Projects() {
         tech_stack: form.techstack.split(",").map((s) => s.trim()).filter(Boolean),
         features: form.features.split(",").map((s) => s.trim()).filter(Boolean),
         link: form.link,
-        github: form.github,
       })
       .eq("id", editProject.id);
     setEditProject(null);
