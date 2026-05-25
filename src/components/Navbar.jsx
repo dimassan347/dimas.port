@@ -91,7 +91,7 @@ const Navbar = () => {
                             onClick={(e) => scrollToSection(e, "#Hero")}
                             className="text-xl font-bold bg-gradient-to-r from-theme-primary-light to-theme-primary-dark bg-clip-text text-transparent"
                         >
-                            asutrisna.dev
+                            asutrisnadev
                         </a>
                     </div>
 

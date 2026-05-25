@@ -1,12 +1,11 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import React, { useState, lazy, Suspense } from "react";
+import React, { lazy, Suspense } from "react";
 import { HelmetProvider } from "react-helmet-async";
 import "./index.css";
 import Navbar from "./components/Navbar";
 import Home from "./Pages/Home";
 import About from "./Pages/About";
 import AnimatedBackground from "./components/Background";
-import { AnimatePresence } from "framer-motion";
 import Footer from "./components/Footer";
 import WorkExperienceSection from "./components/WorkExperienceSection";
 import { useTheme } from "./hooks/useTheme";
@@ -18,34 +17,21 @@ import ProtectedRoute from "./components/ProtectedRoute";
 const Portofolio = lazy(() => import("./Pages/Portofolio"));
 const ContactPage = lazy(() => import("./Pages/Contact"));
 const ProjectDetails = lazy(() => import("./components/ProjectDetail"));
-const WelcomeScreen = lazy(() => import("./Pages/WelcomeScreen"));
 const NotFoundPage = lazy(() => import("./Pages/404"));
 
-const LandingPage = ({ showWelcome, setShowWelcome }) => {
+const LandingPage = () => {
   return (
     <>
-      <AnimatePresence mode="wait">
-        {showWelcome && (
-          <Suspense fallback={null}>
-            <WelcomeScreen onLoadingComplete={() => setShowWelcome(false)} />
-          </Suspense>
-        )}
-      </AnimatePresence>
+      <Navbar />
 
-      {!showWelcome && (
-        <>
-          <Navbar />
-
-          <Home />
-          <About />
-          <WorkExperienceSection />
-          <Suspense fallback={<div className="h-20" />}>
-            <Portofolio />
-            <ContactPage />
-          </Suspense>
-          <Footer />
-        </>
-      )}
+      <Home />
+      <About />
+      <WorkExperienceSection />
+      <Suspense fallback={<div className="h-20" />}>
+        <Portofolio />
+        <ContactPage />
+      </Suspense>
+      <Footer />
     </>
   );
 };
@@ -60,7 +46,6 @@ const ProjectPageLayout = () => (
 );
 
 function App() {
-  const [showWelcome, setShowWelcome] = useState(true);
   useTheme();
 
   return (
@@ -74,12 +59,7 @@ function App() {
           {/* PUBLIC */}
           <Route
             path="/"
-            element={
-              <LandingPage
-                showWelcome={showWelcome}
-                setShowWelcome={setShowWelcome}
-              />
-            }
+            element={<LandingPage />}
           />
 
           <Route path="/project/:slug" element={<ProjectPageLayout />} />

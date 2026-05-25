@@ -15,6 +15,20 @@ const ABOUT_FALLBACK = {
 
 // No normalizeCvPath needed
 
+const parseSupabaseStorageUrl = (value) => {
+  if (!value || typeof value !== 'string') return null
+
+  const match = value.match(/\/storage\/v1\/object\/(?:public|sign)\/([^/]+)\/(.+?)(?:\?.*)?$/)
+  if (!match) return null
+
+  const bucket = match[1]
+  const filePath = decodeURIComponent(match[2])
+
+  if (!bucket || !filePath) return null
+
+  return { bucket, filePath }
+}
+
 // Memoized Components
 const Header = memo(({ name }) => (
   <div className="text-center lg:mb-8 mb-2 px-[5%]">
@@ -89,7 +103,7 @@ const ProfileImage = memo(({ photoUrl }) => (
 ));
 ProfileImage.displayName = 'ProfileImage';
 
-const StatCard = memo(({ icon: Icon, color, value, label, description, animation, href }) => {
+const StatCard = memo(({ icon: Icon, value, label, description, animation, href }) => {
   const Wrapper = href ? 'a' : 'div'
 
   return (
@@ -147,7 +161,6 @@ StatCard.displayName = 'StatCard';
 
 const AboutPage = () => {
   const [aboutContent, setAboutContent] = useState(null)
-  const [cvDownloadUrl, setCvDownloadUrl] = useState('')
 
   // Projects & certificates from localStorage
   const storedProjects = JSON.parse(localStorage.getItem('projects') || '[]')
@@ -251,25 +264,47 @@ const AboutPage = () => {
 
   const content = aboutContent || ABOUT_FALLBACK
 
-  useEffect(() => {
-    const resolveCvDownloadUrl = async () => {
-      const cvValue = content.cv_url || ABOUT_FALLBACK.cv_url
+  const handleCvDownload = async (event) => {
+    const cvValue = content.cv_url || ABOUT_FALLBACK.cv_url
 
-      if (!cvValue) {
-        setCvDownloadUrl('')
-        return
+    if (!cvValue) return
+
+    const storageLocation = parseSupabaseStorageUrl(cvValue)
+    if (!storageLocation) return
+
+    event.preventDefault()
+
+    try {
+      const { data, error } = await supabase.storage
+        .from(storageLocation.bucket)
+        .createSignedUrl(storageLocation.filePath, 60)
+
+      if (error || !data?.signedUrl) {
+        throw error || new Error('Failed to create CV download URL')
       }
 
-      // Force download by appending ?download= if it's a Supabase URL
-      const finalUrl = cvValue.includes('supabase.co') && !cvValue.includes('?download')
-        ? `${cvValue}?download=`
-        : cvValue;
-        
-      setCvDownloadUrl(finalUrl)
-    }
+      const response = await fetch(data.signedUrl)
+      if (!response.ok) {
+        throw new Error('Failed to fetch CV file')
+      }
 
-    resolveCvDownloadUrl()
-  }, [content.cv_url])
+      const blob = await response.blob()
+      const objectUrl = URL.createObjectURL(blob)
+      const fileName = storageLocation.filePath.split('/').pop() || 'cv.pdf'
+
+      const link = document.createElement('a')
+      link.href = objectUrl
+      link.download = fileName
+      document.body.appendChild(link)
+      link.click()
+      link.remove()
+
+      URL.revokeObjectURL(objectUrl)
+    } catch (error) {
+      console.error('Failed to download CV:', error)
+      window.open(cvValue, '_blank', 'noopener,noreferrer')
+    }
+  }
 
   // Optimized AOS initialization
   useEffect(() => {
@@ -386,7 +421,7 @@ const AboutPage = () => {
             </div>
 
             <div className="flex flex-col lg:flex-row items-center lg:items-start gap-4 lg:gap-4 lg:px-0 w-full">
-              <a href={cvDownloadUrl || content.cv_url || ABOUT_FALLBACK.cv_url} className="w-full lg:w-auto" target="_blank" rel="noopener noreferrer">
+              <a href={content.cv_url || ABOUT_FALLBACK.cv_url} onClick={handleCvDownload} className="w-full lg:w-auto" target="_blank" rel="noopener noreferrer">
                 <button
                   data-aos="fade-up"
                   data-aos-duration="800"

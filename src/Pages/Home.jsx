@@ -307,7 +307,7 @@ const Home = () => {
   return (
     <>
       <Helmet>
-        {pageTitle && <title>{pageTitle}</title>}
+        <title>asutrisnadev</title>
         {pageDescription && <meta name="description" content={pageDescription} />}
         <meta name="robots" content="index, follow" />
         {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}

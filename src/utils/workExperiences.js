@@ -2,6 +2,38 @@
  * Normalize work experience data from Supabase
  * Ensures all required fields have default values
  */
+export const MONTH_NAMES = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December',
+]
+
+export const MIN_YEAR = 1950
+export const MAX_YEAR = new Date().getFullYear() + 5
+
+export const EMPLOYMENT_TYPES = [
+    'Magang',
+    'Full Time',
+    'Kontrak',
+    'Freelance',
+    'Part Time',
+]
+
+const toNumberOrNull = (value) => {
+    if (value === '' || value === null || value === undefined) return null
+    const parsed = Number(value)
+    return Number.isFinite(parsed) ? parsed : null
+}
+
 export const normalizeWorkExperience = (experience) => {
     let tech_stack = [];
     if (typeof experience.tech_stack === 'string') {
@@ -20,16 +52,57 @@ export const normalizeWorkExperience = (experience) => {
         company: experience.company || '',
         employment_type: experience.employment_type || 'Full Time',
         location: experience.location || '',
-        start_month: experience.start_month || 1,
-        start_year: experience.start_year || new Date().getFullYear(),
-        end_month: experience.end_month || null,
-        end_year: experience.end_year || null,
-        is_current: experience.is_current || false,
+        start_month: toNumberOrNull(experience.start_month) || 1,
+        start_year: toNumberOrNull(experience.start_year) || new Date().getFullYear(),
+        end_month: toNumberOrNull(experience.end_month),
+        end_year: toNumberOrNull(experience.end_year),
+        is_current: Boolean(experience.is_current),
         description: experience.description || '',
         tech_stack: tech_stack,
         display_order: experience.display_order || 1,
     };
 };
+
+export const validateWorkExperienceForm = (form) => {
+    const errors = {}
+
+    if (!String(form.position || '').trim()) errors.position = 'Position is required'
+    if (!String(form.company || '').trim()) errors.company = 'Company is required'
+    if (!EMPLOYMENT_TYPES.includes(form.employment_type)) errors.employment_type = 'Choose an employment type'
+
+    const startMonth = toNumberOrNull(form.start_month)
+    const startYear = toNumberOrNull(form.start_year)
+    const endMonth = toNumberOrNull(form.end_month)
+    const endYear = toNumberOrNull(form.end_year)
+
+    if (!startMonth || startMonth < 1 || startMonth > 12) errors.start_month = 'Start month is required'
+    if (!startYear || startYear < MIN_YEAR || startYear > MAX_YEAR) errors.start_year = 'Start year is required'
+
+    if (!form.is_current) {
+        if (!endMonth || endMonth < 1 || endMonth > 12) errors.end_month = 'End month is required'
+        if (!endYear || endYear < MIN_YEAR || endYear > MAX_YEAR) errors.end_year = 'End year is required'
+    }
+
+    return errors
+}
+
+export const buildWorkExperiencePayload = (form) => {
+    const isCurrent = Boolean(form.is_current)
+
+    return {
+        position: String(form.position || '').trim(),
+        employment_type: String(form.employment_type || 'Full Time'),
+        company: String(form.company || '').trim(),
+        is_current: isCurrent,
+        start_month: toNumberOrNull(form.start_month),
+        start_year: toNumberOrNull(form.start_year),
+        end_month: isCurrent ? null : toNumberOrNull(form.end_month),
+        end_year: isCurrent ? null : toNumberOrNull(form.end_year),
+        location: String(form.location || '').trim() || null,
+        description: String(form.description || '').trim() || null,
+        tech_stack: Array.isArray(form.tech_stack) ? form.tech_stack : [],
+    }
+}
 
 /**
  * Compare function for sorting work experiences by timeline

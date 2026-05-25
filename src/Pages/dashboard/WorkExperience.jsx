@@ -116,13 +116,18 @@ const ExperienceForm = ({ initial = null, onSubmit, onCancel, submitting }) => {
 
     const handleSubmit = (e) => {
         e.preventDefault()
+        if (!form.is_current && (!form.end_month || !form.end_year)) {
+            alert('Please fill end month and end year, or mark the role as current.')
+            return
+        }
+
         const payload = {
             ...form,
             start_month:  form.start_month  ? parseInt(form.start_month)  : null,
             start_year:   form.start_year   ? parseInt(form.start_year)   : null,
             end_month:    form.is_current ? null : (form.end_month  ? parseInt(form.end_month)  : null),
             end_year:     form.is_current ? null : (form.end_year   ? parseInt(form.end_year)   : null),
-            tech_stack:   JSON.stringify(techStack),
+            tech_stack:   techStack,
         }
         onSubmit(payload)
     }
