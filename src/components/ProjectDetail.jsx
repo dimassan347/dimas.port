@@ -65,7 +65,7 @@ const ProjectStats = ({ project }) => {
   const featuresCount = project?.Features?.length || 0;
 
   return (
-    <div className="grid grid-cols-2 gap-3 md:gap-4 p-3 md:p-4 bg-[#0a0a1a] rounded-xl overflow-hidden relative">
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4 p-3 md:p-4 bg-[#0a0a1a] rounded-xl overflow-hidden relative">
       <div className="absolute inset-0 bg-gradient-to-br from-blue-900/20 to-purple-900/20 opacity-50 blur-2xl z-0" />
       <div className="relative z-10 flex items-center space-x-2 md:space-x-3 bg-white/5 p-2 md:p-3 rounded-lg border border-blue-500/20 transition-all duration-300 hover:scale-105 hover:border-blue-500/50 hover:shadow-lg">
         <div className="bg-blue-500/20 p-1.5 md:p-2 rounded-full">
@@ -352,18 +352,18 @@ const ProjectDetails = () => {
 
         <div className="relative">
           <div className="max-w-7xl mx-auto px-4 md:px-6 py-8 md:py-16">
-            <div className="flex items-center space-x-2 md:space-x-4 mb-8 md:mb-12 animate-fadeIn">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 mb-8 md:mb-12 animate-fadeIn min-w-0">
               <button
                 onClick={() => navigate(-1)}
-                className="group inline-flex items-center space-x-1.5 md:space-x-2 px-3 md:px-5 py-2 md:py-2.5 bg-white/5 backdrop-blur-xl rounded-xl text-white/90 hover:bg-white/10 transition-all duration-300 border border-white/10 hover:border-white/20 text-sm md:text-base"
+                className="group inline-flex items-center justify-center space-x-1.5 md:space-x-2 px-3 md:px-5 py-2 md:py-2.5 bg-white/5 backdrop-blur-xl rounded-xl text-white/90 hover:bg-white/10 transition-all duration-300 border border-white/10 hover:border-white/20 text-sm md:text-base w-fit shrink-0"
               >
                 <ArrowLeft className="w-4 h-4 md:w-5 md:h-5 group-hover:-translate-x-1 transition-transform" />
                 <span>Back</span>
               </button>
-              <div className="flex items-center space-x-1 md:space-x-2 text-sm md:text-base text-white/50">
-                <span>Projects</span>
-                <ChevronRight className="w-3 h-3 md:w-4 md:h-4" />
-                <span className="text-white/90 truncate">{project.Title}</span>
+              <div className="flex min-w-0 items-center space-x-1 md:space-x-2 text-sm md:text-base text-white/50">
+                <span className="shrink-0">Projects</span>
+                <ChevronRight className="w-3 h-3 md:w-4 md:h-4 shrink-0" />
+                <span className="min-w-0 truncate text-white/90">{project.Title}</span>
               </div>
             </div>
 
@@ -452,14 +452,14 @@ const ProjectDetails = () => {
                   </div>
 
                   {projectImages.length > 1 && (
-                    <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
                       {projectImages.slice(1).map((image, index) => (
                         <a
                           key={`${image}-${index}`}
                           href={image}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="group relative overflow-hidden rounded-xl border border-white/10 bg-white/5 aspect-[16/10]"
+                          className="group relative overflow-hidden rounded-xl border border-white/10 bg-white/5 aspect-[16/10] min-w-0"
                         >
                           <img
                             src={image}

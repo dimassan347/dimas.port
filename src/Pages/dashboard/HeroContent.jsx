@@ -25,8 +25,6 @@ const HERO_FALLBACK = {
     ],
     hero_image_url: '/Animation1.gif',
     hero_image_alt: 'Developer illustration',
-    accent_from: '#6366f1',
-    accent_to: '#a855f7',
 }
 
 const InputField = ({ label, value, onChange, placeholder, type = 'text', required = false, hint }) => (
@@ -138,9 +136,7 @@ export default function HeroContentDashboard() {
     const [saveStatus, setSaveStatus] = useState(null)
     const [imageFile, setImageFile] = useState(null)
     const [imagePreview, setImagePreview] = useState(null)
-    const [isAtBottom, setIsAtBottom] = useState(false)
     const formRef = useRef(null)
-    const [dockDims, setDockDims] = useState({ left: 0, width: 0 })
     const { toasts, pushToast, removeToast } = useToast()
 
     // Fetch the hero content (should exist)
@@ -161,7 +157,16 @@ export default function HeroContentDashboard() {
                     initForm(data)
                 } else {
                     // No hero exists, create one with fallback
-                    await createDefaultHero()
+                    const { data: createdHero, error: createError } = await supabase
+                        .from('hero_contents')
+                        .insert([{ ...HERO_FALLBACK, is_active: true, sort_order: 0 }])
+                        .select()
+                        .single()
+
+                    if (createError) throw createError
+                    setHeroItem(createdHero)
+                    initForm(createdHero)
+                    pushToast('success', 'Default hero content created successfully!')
                 }
             } catch (err) {
                 console.error('Exception fetching hero:', err)
@@ -171,43 +176,7 @@ export default function HeroContentDashboard() {
         }
 
         fetchHero()
-    }, [])
-
-    // Track scroll position to toggle floating vs docked save button
-    useEffect(() => {
-        const updateDock = () => {
-            try {
-                const threshold = 80
-                const scrolledToBottom = (window.innerHeight + window.scrollY) >= (document.documentElement.scrollHeight - threshold)
-                setIsAtBottom(scrolledToBottom)
-
-                const vw = window.innerWidth || document.documentElement.clientWidth
-                // On small screens, dock to near-full width with side padding
-                if (formRef.current) {
-                    const rect = formRef.current.getBoundingClientRect()
-                    if (vw < 768) {
-                        const side = 16
-                        setDockDims({ left: side, width: Math.max(240, vw - side * 2) })
-                    } else {
-                        setDockDims({ left: rect.left, width: rect.width })
-                    }
-                } else if (vw < 768) {
-                    const side = 16
-                    setDockDims({ left: side, width: Math.max(240, vw - side * 2) })
-                }
-            } catch {
-                // ignore in non-browser env
-            }
-        }
-
-        updateDock()
-        window.addEventListener('scroll', updateDock, { passive: true })
-        window.addEventListener('resize', updateDock)
-        return () => {
-            window.removeEventListener('scroll', updateDock)
-            window.removeEventListener('resize', updateDock)
-        }
-    }, [])
+    }, [pushToast])
 
     const initForm = (heroData) => {
         setForm({
@@ -220,29 +189,9 @@ export default function HeroContentDashboard() {
             cta_buttons: Array.isArray(heroData.cta_buttons) ? heroData.cta_buttons : [],
             hero_image_url: heroData.hero_image_url,
             hero_image_alt: heroData.hero_image_alt,
-            accent_from: heroData.accent_from,
-            accent_to: heroData.accent_to,
         })
         setImagePreview(heroData.hero_image_url)
         setImageFile(null)
-    }
-
-    const createDefaultHero = async () => {
-        try {
-            const { data, error } = await supabase
-                .from('hero_contents')
-                .insert([{ ...HERO_FALLBACK, is_active: true, sort_order: 0 }])
-                .select()
-                .single()
-
-            if (error) throw error
-            setHeroItem(data)
-            initForm(data)
-            pushToast('success', 'Default hero content created successfully!')
-        } catch (err) {
-            console.error('Error creating default hero:', err)
-            pushToast('error', err.message || 'Failed to create default hero content')
-        }
     }
 
     const set = (key) => (event) => {
@@ -295,8 +244,6 @@ export default function HeroContentDashboard() {
                 })).filter((cta) => cta.label && cta.url),
                 hero_image_url: heroImageUrl,
                 hero_image_alt: form.hero_image_alt.trim(),
-                accent_from: form.accent_from.trim(),
-                accent_to: form.accent_to.trim(),
                 is_active: true,
             }
 
@@ -558,45 +505,6 @@ export default function HeroContentDashboard() {
 
                             <InputField label="Image Alt Text" value={form.hero_image_alt} onChange={set('hero_image_alt')} placeholder="Developer illustration" hint="For accessibility and SEO" />
 
-                            <div className="grid grid-cols-2 gap-4 pt-2">
-                                <div className="space-y-1.5">
-                                    <label className="text-xs text-indigo-300/70 uppercase tracking-wider font-medium">Accent Start</label>
-                                    <div className="flex items-center gap-3 bg-black/20 border border-white/10 rounded-xl p-2 focus-within:border-indigo-500/60 transition-colors">
-                                        <input
-                                            type="color"
-                                            value={form.accent_from}
-                                            onChange={set('accent_from')}
-                                            className="h-8 w-8 rounded-lg border-0 bg-transparent cursor-pointer"
-                                        />
-                                        <input
-                                            type="text"
-                                            value={form.accent_from}
-                                            onChange={set('accent_from')}
-                                            className="flex-1 bg-transparent text-gray-200 text-sm outline-none"
-                                        />
-                                    </div>
-                                </div>
-
-                                <div className="space-y-1.5">
-                                    <label className="text-xs text-indigo-300/70 uppercase tracking-wider font-medium">Accent End</label>
-                                    <div className="flex items-center gap-3 bg-black/20 border border-white/10 rounded-xl p-2 focus-within:border-indigo-500/60 transition-colors">
-                                        <input
-                                            type="color"
-                                            value={form.accent_to}
-                                            onChange={set('accent_to')}
-                                            className="h-8 w-8 rounded-lg border-0 bg-transparent cursor-pointer"
-                                        />
-                                        <input
-                                            type="text"
-                                            value={form.accent_to}
-                                            onChange={set('accent_to')}
-                                            className="flex-1 bg-transparent text-gray-200 text-sm outline-none"
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="h-16 rounded-xl border border-white/10 shadow-inner" style={{ background: `linear-gradient(90deg, ${form.accent_from}, ${form.accent_to})` }} />
                         </div>
                     </div>
 

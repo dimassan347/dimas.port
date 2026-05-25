@@ -10,7 +10,7 @@ export default function ToastStack({ toasts = [], onDismiss }) {
     if (!toasts.length) return null
 
     return (
-        <div className="fixed bottom-4 right-4 z-[9999] flex w-[calc(100vw-2rem)] max-w-sm flex-col gap-3 pointer-events-none">
+        <div className="fixed top-4 right-4 z-[9999] flex w-[calc(100vw-2rem)] max-w-sm flex-col gap-3 pointer-events-none">
             {toasts.map((toast) => (
                 <div
                     key={toast.id}

@@ -191,8 +191,6 @@ const Home = () => {
             cta_buttons: normalizeCtaButtons(data.cta_buttons),
             hero_image_url: data.hero_image_url?.trim() || '',
             hero_image_alt: data.hero_image_alt?.trim() || '',
-            accent_from: data.accent_from?.trim() || '',
-            accent_to: data.accent_to?.trim() || '',
           })
         } else {
           setHeroData(null)
@@ -411,8 +409,8 @@ const Home = () => {
                 data-aos="fade-left"
                 data-aos-delay="600">
                 <div className="relative w-full opacity-90">
-                  <div className={`absolute inset-0 bg-gradient-to-r from-[color:${heroData.accent_from}]/10 to-[color:${heroData.accent_to}]/10 rounded-3xl blur-3xl transition-all duration-700 ease-in-out ${isHovering ? "opacity-50 scale-105" : "opacity-20 scale-100"
-                    }`} style={{ backgroundImage: `linear-gradient(to right, ${heroData.accent_from}1a, ${heroData.accent_to}1a)` }}>
+                  <div className={`absolute inset-0 bg-gradient-to-r from-[color:var(--color-primary-dark)]/10 to-[color:var(--color-primary-light)]/10 rounded-3xl blur-3xl transition-all duration-700 ease-in-out ${isHovering ? "opacity-50 scale-105" : "opacity-20 scale-100"
+                    }`} style={{ backgroundImage: 'linear-gradient(to right, var(--color-primary-dark), var(--color-primary-light))', opacity: 0.1 }}>
                   </div>
 
                   <div className={`relative lg:left-12 z-10 w-full opacity-90 transform transition-transform duration-500 ${isHovering ? "scale-105" : "scale-100"
@@ -432,7 +430,7 @@ const Home = () => {
                   <div className={`absolute inset-0 pointer-events-none transition-all duration-700 ${isHovering ? "opacity-50" : "opacity-20"
                     }`}>
                     <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] blur-3xl animate-[pulse_6s_cubic-bezier(0.4,0,0.6,1)_infinite] transition-all duration-700 ${isHovering ? "scale-110" : "scale-100"
-                      }`} style={{ background: `linear-gradient(to bottom right, ${heroData.accent_from}19, ${heroData.accent_to}19)` }}>
+                      }`} style={{ background: 'linear-gradient(to bottom right, var(--color-primary-dark), var(--color-primary-light))', opacity: 0.1 }}>
                     </div>
                   </div>
                 </div>
