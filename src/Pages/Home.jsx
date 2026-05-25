@@ -394,7 +394,7 @@ const Home = () => {
                   </div>
 
                   {/* Social Links */}
-                  <div className="hidden sm:flex gap-4 justify-start" data-aos="fade-up" data-aos-delay="1600">
+                  <div className="flex flex-wrap gap-3 justify-start" data-aos="fade-up" data-aos-delay="1600">
                     {socialLinks.map((social, index) => (
                       <SocialLink key={index} {...social} />
                     ))}
@@ -403,7 +403,7 @@ const Home = () => {
               </div>
 
               {/* Right Column - WebM Video */}
-              <div className="w-full py-0 md:py-[10%] sm:py-0 lg:w-1/2 h-[260px] sm:h-[400px] lg:h-[600px] xl:h-[750px] relative flex items-center justify-center order-2 lg:order-2  mt-5 sm:mt-0"
+              <div className="hidden lg:flex w-full py-0 md:py-[10%] sm:py-0 lg:w-1/2 h-[260px] sm:h-[400px] lg:h-[600px] xl:h-[750px] relative items-center justify-center order-2 lg:order-2  mt-5 sm:mt-0"
                 onMouseEnter={() => setIsHovering(true)}
                 onMouseLeave={() => setIsHovering(false)}
                 data-aos="fade-left"
