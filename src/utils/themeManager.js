@@ -168,7 +168,7 @@ export const fetchTheme = async () => {
             .from('site_theme')
             .select('*')
             .eq('id', 1)
-            .single();
+            .maybeSingle();
 
         if (error) throw error;
 
@@ -183,14 +183,13 @@ export const updateTheme = async (colors) => {
     try {
         const { data, error } = await supabase
             .from('site_theme')
-            .update(colors)
-            .eq('id', 1)
+            .upsert({ id: 1, ...colors }, { onConflict: 'id' })
             .select()
-            .single();
+            .maybeSingle();
 
         if (error) throw error;
 
-        return data;
+        return data || { id: 1, ...colors };
     } catch (error) {
         console.error('Error updating theme:', error);
         throw error;
@@ -201,14 +200,13 @@ export const resetTheme = async () => {
     try {
         const { data, error } = await supabase
             .from('site_theme')
-            .update(DEFAULT_THEME)
-            .eq('id', 1)
+            .upsert({ id: 1, ...DEFAULT_THEME }, { onConflict: 'id' })
             .select()
-            .single();
+            .maybeSingle();
 
         if (error) throw error;
 
-        return data;
+        return data || { id: 1, ...DEFAULT_THEME };
     } catch (error) {
         console.error('Error resetting theme:', error);
         throw error;

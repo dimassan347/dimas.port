@@ -147,7 +147,7 @@ export const useTheme = () => {
                     .from('site_theme')
                     .select('*')
                     .eq('id', 1)
-                    .single();
+                    .maybeSingle();
 
                 if (error) throw error;
 
